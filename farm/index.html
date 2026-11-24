@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Red palm weevil spread from a 2 x 2 introduction over six years, drawn over an image of a date-palm farm, with or without replanting, one frame per day.">
+<style>
+/* base reset (claude.ai adds this when it publishes; needed for a standalone copy) */
+*, *::before, *::after { box-sizing: border-box; }
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font-size: 14px; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Orchard Spread, Six Years</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one viewing bench — a replanting switch above a single film, transport bar under it, notes below. */
+:root {
+  --bg: #f4f6f3;          /* page: grey with a frond-green bias */
+  --panel: #ffffff;       /* film mount and panels */
+  --fg: #18201b;          /* text */
+  --muted: #5b665e;       /* secondary text */
+  --rule: #d6ddd7;        /* hairlines */
+  --accent: #2f6b4f;      /* frond green: controls, year marks */
+  --accent-fg: #ffffff;
+  --f-display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111614; --panel: #1a211d; --fg: #e6ece7; --muted: #9aa79e; --rule: #2c3630;
+    --accent: #6fbf95; --accent-fg: #0d1410; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111614; --panel: #1a211d; --fg: #e6ece7; --muted: #9aa79e; --rule: #2c3630;
+  --accent: #6fbf95; --accent-fg: #0d1410; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 24px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font: 500 12px/1.3 var(--f-data); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 600 clamp(26px, 3.4vw, 38px)/1.1 var(--f-display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h2 { font: 600 20px/1.2 var(--f-display); margin: 0; text-wrap: balance; }
+.lede { max-width: 72ch; margin: 0; color: var(--muted); }
+
+/* replanting switch */
+.choice { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.switch { position: relative; display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; padding: 3px; background: var(--panel); }
+.switch input { position: absolute; opacity: 0; pointer-events: none; }
+.switch label {
+  font: 500 14px/1 var(--f-body); padding: 9px 14px; border-radius: 6px; cursor: pointer; color: var(--muted);
+}
+.switch input:checked + label { background: var(--accent); color: var(--accent-fg); }
+.switch input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.choice-note { color: var(--muted); font-size: 14px; }
+
+/* film */
+.mount { background: #fff; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; line-height: 0; }
+video { width: 100%; height: auto; display: block; aspect-ratio: 1600 / 800; max-width: 100%; }
+
+/* transport */
+.transport {
+  position: sticky; bottom: 0; z-index: 5;
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+  display: grid; grid-template-columns: auto auto 1fr auto; gap: 10px 16px; align-items: center;
+}
+@media (max-width: 640px) { .transport { grid-template-columns: auto 1fr; } .scrub, .speeds { grid-column: 1 / -1; } .speeds { justify-self: start; } }
+button {
+  font: 500 14px/1 var(--f-body); color: var(--fg); background: transparent;
+  border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px; cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:focus-visible, input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#play { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); min-width: 5.5em; }
+.readout { font: 500 15px/1.2 var(--f-data); font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 13ch; }
+.readout small { display: block; font-size: 11px; color: var(--muted); }
+.scrub { position: relative; min-width: 0; padding-bottom: 16px; }
+input[type=range] { width: 100%; accent-color: var(--accent); margin: 0; }
+.yearmarks { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; font: 11px/14px var(--f-data); color: var(--muted); }
+.yearmarks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.speeds { display: flex; gap: 4px; }
+.speeds button { padding: 6px 9px; font: 500 12px/1 var(--f-data); }
+.speeds button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.hint { font-size: 12px; color: var(--muted); margin: -12px 0 0; }
+
+/* notes */
+section { display: grid; gap: 12px; align-content: start; min-width: 0; }
+section p, section li { max-width: 72ch; }
+section p { margin: 0; }
+ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Red palm weevil · date palms at 8 m · one frame per day</div>
+    <h1>Six years after a 2 × 2 introduction</h1>
+    <p class="lede">Four palms are infested on 1 January of year 1. Choose whether dead palms are replanted or left to stand. Each simulation runs from day 1 to day 2190 and is drawn over an aerial image of a date-palm farm. The farm image is for demonstration purposes only.</p>
+  </header>
+
+  <div class="choice">
+    <div class="switch" role="radiogroup" aria-label="Replanting">
+      <input type="radio" name="replant" id="opt-with" value="with" checked><label for="opt-with">With replanting</label>
+      <input type="radio" name="replant" id="opt-without" value="without"><label for="opt-without">Without replanting</label>
+    </div>
+    <span class="choice-note" id="choice-note">Dead palms are replaced, on average 200 days after they die.</span>
+  </div>
+
+  <div class="mount">
+    <video id="v-with" src="overlay-replanting.mp4" muted playsinline preload="auto" aria-label="Simulation with replanting"></video>
+    <video id="v-without" src="overlay-no-replanting.mp4" muted playsinline preload="auto" aria-label="Simulation without replanting" hidden></video>
+  </div>
+
+  <div class="transport" role="group" aria-label="Playback">
+    <button id="play" type="button" aria-label="Play">Play</button>
+    <div class="readout"><span id="date">year 1, 01 Jan</span><small id="dayno">day 1 of 2190</small></div>
+    <div class="scrub">
+      <input id="scrub" type="range" min="1" max="2190" step="1" value="1" aria-label="Day">
+      <div class="yearmarks" aria-hidden="true">
+        <span style="left:0%;transform:none">yr 1</span>
+        <span style="left:16.667%">yr 2</span>
+        <span style="left:33.333%">yr 3</span>
+        <span style="left:50%">yr 4</span>
+        <span style="left:66.667%">yr 5</span>
+        <span style="left:83.333%">yr 6</span>
+        <span style="left:100%;transform:translateX(-100%)">end</span>
+      </div>
+    </div>
+    <div class="speeds" role="group" aria-label="Speed">
+      <button type="button" data-rate="0.5" aria-pressed="false">½×</button>
+      <button type="button" data-rate="1" aria-pressed="true">1×</button>
+      <button type="button" data-rate="2" aria-pressed="false">2×</button>
+      <button type="button" data-rate="4" aria-pressed="false">4×</button>
+    </div>
+  </div>
+  <p class="hint">At 1× a year takes about 15 s (24 days a second). Switching replanting keeps the current day. Space plays or pauses; the arrow keys step a day, Shift + arrow a week.</p>
+
+  <section>
+    <h2>What each frame shows</h2>
+    <ul>
+      <li><b>Palms</b>: the crowns in the image stand for the susceptible palms; amber cryptic (infested, no symptoms yet), red symptomatic, black dead.</li>
+      <li><b>Blue cloud</b>: females flying over the last 7 days, log scale 0.01–10 per palm.</li>
+      <li><b>Navy outline</b>: a palm releasing at least one flying female that day.</li>
+      <li><b>Rings</b>: black, infested that day; grey and fading, infested in the previous 6 days.</li>
+      <li><b>White outline</b>: the farm boundary. Palms outside it are simulated but not drawn.</li>
+    </ul>
+    <p>The simulated orchard is a regular 8 m grid laid over the planting. The image is not georeferenced: the grid was matched to the crowns on one block, so elsewhere a drawn palm can sit up to half a spacing off a real crown.</p>
+    <p>Palms die on average 9.4 months after infestation (median 8.8, 10–90 % 5–15 months): about 2 months to symptoms, then a collapse spread over four hidden stages. Fewer than 1 % die within 3 months. The first black palm appears in August of year 1 without replanting and in October with it: the fastest of the four introduced palms in each simulation.</p>
+  </section>
+</div>
+
+<script>
+(() => {
+  const FPS = 24, DAYS = 2190, START_DOY = 1;           // day 1 = 1 January
+  const V = { with: document.getElementById("v-with"), without: document.getElementById("v-without") };
+  const NOTE = {
+    with: "Dead palms are replaced, on average 200 days after they die.",
+    without: "Dead palms are left standing and never replaced."
+  };
+  let cur = V.with, raf = 0, scrubbing = false;
+  const play = document.getElementById("play"), scrub = document.getElementById("scrub");
+  const dateEl = document.getElementById("date"), dayEl = document.getElementById("dayno");
+  const note = document.getElementById("choice-note");
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const CUM = [0,31,59,90,120,151,181,212,243,273,304,334,365];
+
+  const dayOf = t => Math.min(DAYS, Math.max(1, Math.floor(t * FPS) + 1));
+  const timeOf = d => (d - 1 + 0.5) / FPS;              // middle of that day's frame
+  function label(day) {
+    const doy = (day - 1 + START_DOY - 1) % 365 + 1, yr = Math.floor((day - 1) / 365) + 1;
+    let m = 0; while (doy > CUM[m + 1]) m++;
+    return `year ${yr}, ${String(doy - CUM[m]).padStart(2, "0")} ${MONTHS[m]}`;
+  }
+  function show(day) {
+    dateEl.textContent = label(day);
+    dayEl.textContent = `day ${day} of ${DAYS}`;
+    if (!scrubbing) scrub.value = day;
+  }
+  function seek(day) { cur.currentTime = timeOf(day); show(day); }
+  function tick() { show(dayOf(cur.currentTime)); raf = requestAnimationFrame(tick); }
+  function setPlaying(on) { play.textContent = on ? "Pause" : "Play"; play.setAttribute("aria-label", on ? "Pause" : "Play"); }
+  async function start() {
+    if (cur.ended || dayOf(cur.currentTime) >= DAYS) seek(1);
+    try { await cur.play(); } catch (e) { cur.pause(); }
+  }
+  const stop = () => cur.pause();
+
+  for (const v of Object.values(V)) {
+    v.addEventListener("play", () => { if (v !== cur) return; setPlaying(true); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); });
+    v.addEventListener("pause", () => { if (v !== cur) return; setPlaying(false); cancelAnimationFrame(raf); show(dayOf(v.currentTime)); });
+    v.addEventListener("ended", () => { if (v === cur) show(DAYS); });
+    v.addEventListener("seeked", () => { if (v === cur) show(dayOf(v.currentTime)); });
+  }
+
+  // switch replanting: same day, same play state, only one film visible
+  function choose(key) {
+    const next = V[key]; if (next === cur) return;
+    const t = cur.currentTime, wasPlaying = !cur.paused;
+    cur.pause(); cancelAnimationFrame(raf);
+    next.currentTime = t; next.playbackRate = cur.playbackRate;
+    cur.hidden = true; next.hidden = false; cur = next;
+    note.textContent = NOTE[key];
+    show(dayOf(t));
+    if (wasPlaying) start(); else setPlaying(false);
+  }
+  document.querySelectorAll('input[name="replant"]').forEach(r => r.addEventListener("change", () => choose(r.value)));
+
+  play.addEventListener("click", () => (cur.paused ? start() : stop()));
+  scrub.addEventListener("input", () => { scrubbing = true; seek(+scrub.value); });
+  scrub.addEventListener("change", () => { scrubbing = false; });
+
+  document.querySelectorAll(".speeds button").forEach(b => b.addEventListener("click", () => {
+    const rate = +b.dataset.rate; for (const v of Object.values(V)) v.playbackRate = rate;
+    document.querySelectorAll(".speeds button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  }));
+
+  document.addEventListener("keydown", e => {
+    if (e.target.closest && e.target.closest("button, input")) return;   // let controls handle their own keys
+    if (e.key === " ") { e.preventDefault(); cur.paused ? start() : stop(); }
+    else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault(); stop();
+      const step = (e.shiftKey ? 7 : 1) * (e.key === "ArrowRight" ? 1 : -1);
+      seek(Math.min(DAYS, Math.max(1, dayOf(cur.currentTime) + step)));
+    }
+  });
+
+  // first frame visible at rest
+  const prime = v => { if (v.readyState >= 1) v.currentTime = timeOf(1); else v.addEventListener("loadedmetadata", () => (v.currentTime = timeOf(1)), { once: true }); };
+  prime(V.with); prime(V.without); show(1);
+})();
+</script>
+</body>
+</html>
