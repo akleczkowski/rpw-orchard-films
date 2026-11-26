@@ -72,16 +72,16 @@ video { width: 100%; height: auto; display: block; aspect-ratio: 1000 / 750; max
   position: sticky; bottom: 0; z-index: 5;
   background: var(--panel); border: 1px solid var(--rule); border-radius: 8px;
   padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
-  display: grid; grid-template-columns: auto auto 1fr auto; gap: 10px 16px; align-items: center;
+  display: grid; grid-template-columns: auto auto auto 1fr auto; gap: 10px 16px; align-items: center;
 }
-@media (max-width: 640px) { .transport { grid-template-columns: auto 1fr; } .scrub, .speeds { grid-column: 1 / -1; } .speeds { justify-self: start; } }
+@media (max-width: 640px) { .transport { grid-template-columns: auto auto 1fr; } .scrub, .speeds { grid-column: 1 / -1; } .speeds { justify-self: start; } }
 button {
   font: 500 14px/1 var(--f-body); color: var(--fg); background: transparent;
   border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px; cursor: pointer;
 }
 button:hover { border-color: var(--accent); }
 button:focus-visible, input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-#play { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); min-width: 5.5em; }
+#play, #reset { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); min-width: 5.5em; }
 .readout { font: 500 15px/1.2 var(--f-data); font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 13ch; }
 .readout small { display: block; font-size: 11px; color: var(--muted); }
 .scrub { position: relative; min-width: 0; padding-bottom: 16px; }
@@ -125,6 +125,7 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
 
   <div class="transport" role="group" aria-label="Playback">
     <button id="play" type="button" aria-label="Play">Play</button>
+    <button id="reset" type="button" aria-label="Back to day 1" title="Back to day 1 (Home key)">Reset</button>
     <div class="readout"><span id="date">year 1, 01 Jan</span><small id="dayno">day 1 of 2190</small></div>
     <div class="scrub">
       <input id="scrub" type="range" min="1" max="2190" step="1" value="1" aria-label="Day">
@@ -145,7 +146,7 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
       <button type="button" data-rate="4" aria-pressed="false">4×</button>
     </div>
   </div>
-  <p class="hint">At 1× a year takes about 15 s (24 days a second). Switching replanting keeps the current day. Space plays or pauses; the arrow keys step a day, Shift + arrow a week.</p>
+  <p class="hint">At 1× a year takes about 15 s (24 days a second). Switching replanting keeps the current day. Reset (or Home) returns both films to day 1. Space plays or pauses; the arrow keys step a day, Shift + arrow a week.</p>
 
   <section>
     <h2>What each frame shows</h2>
@@ -191,11 +192,23 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
   function seek(day) { cur.currentTime = timeOf(day); show(day); }
   function tick() { show(dayOf(cur.currentTime)); raf = requestAnimationFrame(tick); }
   function setPlaying(on) { play.textContent = on ? "Pause" : "Play"; play.setAttribute("aria-label", on ? "Pause" : "Play"); }
+  // at (or within one frame of) the end: the last frame's time can floor to day DAYS - 1
+  const atEnd = v => v.ended || dayOf(v.currentTime) >= DAYS - 1 ||
+    (Number.isFinite(v.duration) && v.currentTime >= v.duration - 1.5 / FPS);
   async function start() {
-    if (cur.ended || dayOf(cur.currentTime) >= DAYS) seek(1);
+    if (atEnd(cur)) seek(1);
     try { await cur.play(); } catch (e) { cur.pause(); }
   }
   const stop = () => cur.pause();
+
+  // reset: both films back to day 1, so neither is left at the end
+  const reset = document.getElementById("reset");
+  function resetTime() {
+    cancelAnimationFrame(raf);
+    for (const v of Object.values(V)) { v.pause(); v.currentTime = timeOf(1); }
+    setPlaying(false); scrubbing = false; show(1);
+  }
+  reset.addEventListener("click", resetTime);
 
   for (const v of Object.values(V)) {
     v.addEventListener("play", () => { if (v !== cur) return; setPlaying(true); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); });
@@ -229,6 +242,7 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
   document.addEventListener("keydown", e => {
     if (e.target.closest && e.target.closest("button, input")) return;   // let controls handle their own keys
     if (e.key === " ") { e.preventDefault(); cur.paused ? start() : stop(); }
+    else if (e.key === "Home") { e.preventDefault(); resetTime(); }
     else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       e.preventDefault(); stop();
       const step = (e.shiftKey ? 7 : 1) * (e.key === "ArrowRight" ? 1 : -1);
