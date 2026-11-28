@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Red palm weevil spread from a 2 x 2 introduction over six years on a 5,000-palm date orchard, with or without replanting, one frame per day.">
+<meta name="description" content="Red palm weevil spread from a 2 x 2 introduction over six years on a 5,000-palm date orchard, with or without replanting, with or without six monitoring traps, one frame per day.">
 <style>
 /* base reset (claude.ai adds this when it publishes; needed for a standalone copy) */
 *, *::before, *::after { box-sizing: border-box; }
@@ -66,6 +66,7 @@ h2 { font: 600 20px/1.2 var(--f-display); margin: 0; text-wrap: balance; }
 /* film */
 .mount { background: #fff; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; line-height: 0; }
 video { width: 100%; height: auto; display: block; aspect-ratio: 1000 / 750; max-width: 100%; }
+video.traps { aspect-ratio: 1000 / 814; }   /* trap films: one more strip panel */
 
 /* transport */
 .transport {
@@ -107,7 +108,7 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
   <header>
     <div class="eyebrow">Red palm weevil · 100 × 50 date palms at 8 m · one frame per day</div>
     <h1>Six years after a 2 × 2 introduction</h1>
-    <p class="lede">Four palms are infested on 1 January of year 1. Choose whether dead palms are replanted or left to stand. Each simulation runs from day 1 to day 2190 on the whole orchard.</p>
+    <p class="lede">Four palms are infested on 1 January of year 1. Choose whether dead palms are replanted or left to stand, and whether to show six monitoring traps. Each simulation runs from day 1 to day 2190 on the whole orchard.</p>
   </header>
 
   <div class="choice">
@@ -115,12 +116,18 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
       <input type="radio" name="replant" id="opt-with" value="with" checked><label for="opt-with">With replanting</label>
       <input type="radio" name="replant" id="opt-without" value="without"><label for="opt-without">Without replanting</label>
     </div>
+    <div class="switch" role="radiogroup" aria-label="Monitoring traps">
+      <input type="radio" name="traps" id="opt-notraps" value="off" checked><label for="opt-notraps">No traps</label>
+      <input type="radio" name="traps" id="opt-traps" value="on"><label for="opt-traps">Monitoring traps</label>
+    </div>
     <span class="choice-note" id="choice-note">Dead palms are replaced, on average 200 days after they die.</span>
   </div>
 
   <div class="mount">
     <video id="v-with" src="replanting.mp4" muted playsinline preload="auto" aria-label="Simulation with replanting"></video>
     <video id="v-without" src="no-replanting.mp4" muted playsinline preload="auto" aria-label="Simulation without replanting" hidden></video>
+    <video id="v-with-traps" class="traps" src="traps-replanting.mp4" muted playsinline preload="metadata" aria-label="Simulation with replanting and monitoring traps" hidden></video>
+    <video id="v-without-traps" class="traps" src="traps-no-replanting.mp4" muted playsinline preload="metadata" aria-label="Simulation without replanting, with monitoring traps" hidden></video>
   </div>
 
   <div class="transport" role="group" aria-label="Playback">
@@ -146,7 +153,7 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
       <button type="button" data-rate="4" aria-pressed="false">4×</button>
     </div>
   </div>
-  <p class="hint">At 1× a year takes about 15 s (24 days a second). Switching replanting keeps the current day. Reset (or Home) returns both films to day 1. Space plays or pauses; the arrow keys step a day, Shift + arrow a week.</p>
+  <p class="hint">At 1× a year takes about 15 s (24 days a second). Switching replanting or traps keeps the current day. Reset (or Home) returns every film to day 1. Space plays or pauses; the arrow keys step a day, Shift + arrow a week.</p>
 
   <section>
     <h2>What each frame shows</h2>
@@ -157,15 +164,20 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
       <li><b>Rings</b>: black, infested that day; grey and fading, infested in the previous 6 days.</li>
       <li><b>Lines</b>: likely source of each infestation in the last 7 days (top source weight ≥ 0.5; a reconstruction, not a record).</li>
       <li><b>Strip</b>: the whole orchard's females flying and new infestations per week for the current year, red cursor at the day.</li>
+      <li><b>Traps</b> (when shown): green triangles at six random points, the same in both simulations; dashed circles, each trap's 50 m catchment. The middle strip panel is the catch per trap per week, the mean of the six traps (bars: simulated counts; line: expected catch).</li>
     </ul>
     <p>Palms die on average 9.3 months after infestation (median 8.9, 10–90 % 5–14 months): about 2 months to symptoms, then a collapse spread over four hidden stages. Fewer than 1 % die within 3 months. The first black palm appears in June of year 1 without replanting and in August with it: the fastest of the four introduced palms in each simulation.</p>
+    <p>The traps only watch: each one catches a small share of the females that land within 50 m of it, and the catches are not taken out of the population, so the spread is exactly the same with traps shown or hidden. The catch rate is a placeholder until it is fitted to field counts. Even so, the pattern is clear: the six traps catch almost nothing for the first three years, while the infestation is small and local, and by years 5 and 6 their mean rises and falls with the whole orchard's flying females (about 1–2 females per trap per week in year 6).</p>
   </section>
 </div>
 
 <script>
 (() => {
   const FPS = 24, DAYS = 2190, START_DOY = 1;           // day 1 = 1 January
-  const V = { with: document.getElementById("v-with"), without: document.getElementById("v-without") };
+  const V = { with: document.getElementById("v-with"), without: document.getElementById("v-without"),
+              "with-traps": document.getElementById("v-with-traps"), "without-traps": document.getElementById("v-without-traps") };
+  const state = { replant: "with", traps: "off" };
+  const keyOf = () => state.replant + (state.traps === "on" ? "-traps" : "");
   const NOTE = {
     with: "Dead palms are replaced, on average 200 days after they die.",
     without: "Dead palms are left standing and never replaced."
@@ -222,13 +234,16 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
     const next = V[key]; if (next === cur) return;
     const t = cur.currentTime, wasPlaying = !cur.paused;
     cur.pause(); cancelAnimationFrame(raf);
-    next.currentTime = t; next.playbackRate = cur.playbackRate;
+    next.playbackRate = cur.playbackRate;
+    if (next.readyState >= 1) next.currentTime = t;      // a trap film may not have its metadata yet
+    else next.addEventListener("loadedmetadata", () => { next.currentTime = t; }, { once: true });
     cur.hidden = true; next.hidden = false; cur = next;
-    note.textContent = NOTE[key];
+    note.textContent = NOTE[state.replant];
     show(dayOf(t));
     if (wasPlaying) start(); else setPlaying(false);
   }
-  document.querySelectorAll('input[name="replant"]').forEach(r => r.addEventListener("change", () => choose(r.value)));
+  document.querySelectorAll('input[name="replant"]').forEach(r => r.addEventListener("change", () => { state.replant = r.value; choose(keyOf()); }));
+  document.querySelectorAll('input[name="traps"]').forEach(r => r.addEventListener("change", () => { state.traps = r.value; choose(keyOf()); }));
 
   play.addEventListener("click", () => (cur.paused ? start() : stop()));
   scrub.addEventListener("input", () => { scrubbing = true; seek(+scrub.value); });
@@ -252,7 +267,10 @@ ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
 
   // first frame visible at rest
   const prime = v => { if (v.readyState >= 1) v.currentTime = timeOf(1); else v.addEventListener("loadedmetadata", () => (v.currentTime = timeOf(1)), { once: true }); };
-  prime(V.with); prime(V.without); show(1);
+  for (const v of Object.values(V)) prime(v);
+  show(1);
+  // #traps in the address opens the page with the traps shown
+  if (location.hash === "#traps") { document.getElementById("opt-traps").checked = true; state.traps = "on"; choose(keyOf()); }
 })();
 </script>
 </body>
